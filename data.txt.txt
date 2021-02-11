@@ -1,0 +1,191 @@
+heroku git:remote -a piece-endpoint
+git remote -v
+git push heroku master
+https://piece-endpoint.herokuapp.com/
+https://sofadog-newsflare.vercel.app/app/pieces/preview
+
+
+You need to open your chrome with following command. (Press window+R)
+
+chrome.exe --user-data-dir="C:/Chrome dev session" --disable-web-security
+
+Kundan@123 ====== password
+
+
+http://localhost:8888/piece
+
+{
+    "title": "Yamamoto ekvfen Pomodoro method 4 data insert",
+    "status": "PUBLISHED",
+    "videoInfo": [{    
+            "video_url": "https://so-fa-dog-ou-res.cloudinary.com/video/upload/v1595848639/20200727_RIP.Yamamoto_ekvfen.mp4",
+            "sentences": [
+                {
+                    "sentence": "Pomodoro method1 dfgfdg"
+                },
+                {
+                    "sentence": "Pomodoro method1 fddfgdfsdfsd" 
+                },
+                {
+                    "sentence": "Pomodoro method1sdfsdfsdfds "
+                }
+            ]
+        },
+        {
+            "video_url": "https://so-fa-dog-ou-res.cloudinary.com/video/upload/v1593099640/samples/20200625_Pomodoro.Method_Re_xvhnk3.mp4",
+            "sentences": [{    
+                    "sentence": "Yamamoto_ekvfen1"
+                },
+                {            
+                    "sentence": "Yamamoto_ekvfen2"
+                }
+            ]
+        },
+        {
+            "video_url": "https://so-fa-dog-ou-res.cloudinary.com/video/upload/v1593099640/samples/20200625_Pomodoro.Method_Re_xvhnk3.mp4",
+            "sentences": [{    
+                    "sentence": "Yamamoto_ekvfen1"
+                },
+                {            
+                    "sentence": "Yamamoto_ekvfen2"
+                }
+            ]
+        },
+        {
+            "video_url": "https://so-fa-dog-ou-res.cloudinary.com/video/upload/v1593099640/samples/20200625_Pomodoro.Method_Re_xvhnk3.mp4",
+            "sentences": [{    
+                    "sentence": "Yamamoto_ekvfen1"
+                },
+                {    
+                    "sentence": "Yamamoto_ekvfen2"
+                }
+            ]
+        },
+        {
+            "video_url": "https://so-fa-dog-ou-res.cloudinary.com/video/upload/v1593099640/samples/20200625_Pomodoro.Method_Re_xvhnk3.mp4",
+            "sentences": [{            
+                    "sentence": "Yamamoto_ekvfen1"
+                },
+                {
+                    "sentence": "Yamamoto_ekvfen2"
+                }
+            ]
+        }
+    ]
+}
+
+
+http://localhost:8888/piece
+
+
+request : 
+{
+    "skip":0,
+    "take":3
+}
+
+
+
+response :
+
+[
+    {
+        "id": 6,
+        "piece_id": null,
+        "status": "PUBLISHED",
+        "title": "Yamamoto ekvfen Pomodoro method 4 data insert",
+        "video_info": [
+            {
+                "video_url": "https://so-fa-dog-ou-res.cloudinary.com/video/upload/v1595848639/20200727_RIP.Yamamoto_ekvfen.mp4",
+                "video_id": null,
+                "sentences": [
+                    {
+                        "sentence": "Pomodoro method1 dfgfdg"
+                    },
+                    {
+                        "sentence": "Pomodoro method1 fddfgdfsdfsd"
+                    },
+                    {
+                        "sentence": "Pomodoro method1sdfsdfsdfds "
+                    }
+                ]
+            },
+            {
+                "video_url": "https://so-fa-dog-ou-res.cloudinary.com/video/upload/v1593099640/samples/20200625_Pomodoro.Method_Re_xvhnk3.mp4",
+                "video_id": null,
+                "sentences": [
+                    {
+                        "sentence": "Yamamoto_ekvfen1"
+                    },
+                    {
+                        "sentence": "Yamamoto_ekvfen2"
+                    }
+                ]
+            },
+            {
+                "video_url": "https://so-fa-dog-ou-res.cloudinary.com/video/upload/v1593099640/samples/20200625_Pomodoro.Method_Re_xvhnk3.mp4",
+                "video_id": null,
+                "sentences": [
+                    {
+                        "sentence": "Yamamoto_ekvfen1"
+                    },
+                    {
+                        "sentence": "Yamamoto_ekvfen2"
+                    }
+                ]
+            },
+            {
+                "video_url": "https://so-fa-dog-ou-res.cloudinary.com/video/upload/v1593099640/samples/20200625_Pomodoro.Method_Re_xvhnk3.mp4",
+                "video_id": null,
+                "sentences": [
+                    {
+                        "sentence": "Yamamoto_ekvfen1"
+                    },
+                    {
+                        "sentence": "Yamamoto_ekvfen2"
+                    }
+                ]
+            },
+            {
+                "video_url": "https://so-fa-dog-ou-res.cloudinary.com/video/upload/v1593099640/samples/20200625_Pomodoro.Method_Re_xvhnk3.mp4",
+                "video_id": null,
+                "sentences": [
+                    {
+                        "sentence": "Yamamoto_ekvfen1"
+                    },
+                    {
+                        "sentence": "Yamamoto_ekvfen2"
+                    }
+                ]
+            }
+        ]
+    }
+]
+
+
+
+http://localhost:8888/piece/10
+
+{
+    "skip":0,
+    "take":3
+}
+
+{
+    "id": 10,
+    "piece_id": null,
+    "status": "DRAFT",
+    "title": "",
+    "video_info": [
+        {
+            "video_url": "download (2).jpg",
+            "video_id": null,
+            "sentences": []
+        },
+        {
+            "video_url": "download (1).jpg",
+            "video_id": null,
+            "sentences": []
+        }
+    ]
+}
