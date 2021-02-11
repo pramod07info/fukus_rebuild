@@ -1,58 +1,58 @@
 
 import { IResponse } from '../model/index';
 import uuid from 'uuid-random';
-import {QueryConstent} from '../constent/query_constent';
+import { QueryConstent } from '../constent/query_constent';
 var db = require('../dbconfig');
 
 export class UsersRepository {
 
     async createUsers(req: any) {
         try {
-            var query = "SELECT * from users where emailid='"+req.body.emailid+"' ALLOW FILTERING;";
-            console.log("query",query);
+            var query = "SELECT * from users where emailid='" + req.body.emailid + "' ALLOW FILTERING;";
+            console.log("query", query);
             var user = await db.query(query);
-            if(user.rows.length == 0){
+            if (user.rows.length == 0) {
                 let userUuid = uuid();
                 // var query = "INSERT INTO users (id,name,nickname,username,emailid,mobile,isactive,isdeleted,isemailvalidate) VALUES(" + userUuid + ",'" + req.body.name + "','" + req.body.nickname + "','" 
                 //     + req.body.username + "','" + req.body.emailid + "','" + req.body.mobile + "',true,false,false);";
                 // console.log("query",query);
-                
-                let userData:any = [userUuid,req.body.name,req.body.nickname,req.body.emailid,req.body.mobile,true,false,false];
-                var data = await db.queryArrayObject(QueryConstent.createUserQuery,userData);
-                
-                if(data){
+
+                let userData: any = [userUuid, req.body.name, req.body.nickname, req.body.emailid, req.body.mobile, true, false, false];
+                var data = await db.queryArrayObject(QueryConstent.createUserQuery, userData);
+
+                if (data) {
                     var query = "INSERT INTO password (id,password,userid) VALUES(" + uuid() + ",'" + req.body.password + "','" + userUuid + "');";
-                    console.log("query",query);
+                    console.log("query", query);
                     var data = await db.query(query);
 
                     // let uuidPassword:any= uuid();
                     // let userPasswod:any = [uuidPassword,req.body.password,userUuid];
                     // var data = await db.queryArrayObject(QueryConstent.createPasswordQuery,userPasswod);
-                    if(data){
-                        console.log("permission ",req.body.permission);
+                    if (data) {
+                        console.log("permission ", req.body.permission);
                         var setPermission = new Set(req.body.permission.split(","));
-                        console.log("permission ",setPermission);
-                        var query = "INSERT INTO roleusers (uid,role,permission) VALUES(" + userUuid + ",'" + req.body.rolename + "',{" +req.body.permission+ "});";
-                        console.log("query",query);
+                        console.log("permission ", setPermission);
+                        var query = "INSERT INTO roleusers (uid,role,permission) VALUES(" + userUuid + ",'" + req.body.rolename + "',{" + req.body.permission + "});";
+                        console.log("query", query);
                         var data = await db.query(query);
-                        if(data){
+                        if (data) {
                             const iResponse: IResponse = {
                                 statusCode: "201",
                                 message: "User created successfully",
                                 data: "",
-                                uuid:userUuid,
+                                uuid: userUuid,
                                 error: ""
                             }
                             return iResponse;
                         }
-                    
+
 
 
 
                         // let uuidRole:any= uuid();
                         // let role:any = [uuidRole,req.body.rolename];
                         // var data = await db.queryArrayObject(QueryConstent.createRoleQuery,role);
-                        
+
                         // if(data){
 
                         //     let uuidUserRole  = uuid();
@@ -70,11 +70,11 @@ export class UsersRepository {
                         //     }
                         //     return iResponse;
                         // }
-                        
+
                     }
-                    
+
                 }
-            }else{
+            } else {
                 const iResponse: IResponse = {
                     statusCode: "201",
                     message: "User Already Exists",
@@ -83,55 +83,55 @@ export class UsersRepository {
                 }
                 return iResponse;
             }
-            
-            
+
+
         } catch (error) {
             console.error(error.message);
             const iResponse: IResponse = {
                 statusCode: "500",
                 message: "Something went worng",
                 data: "",
-                uuid:"",
+                uuid: "",
                 error: error.message
             }
             return iResponse;
-        }finally{
+        } finally {
             //db.close();
         }
 
     }
-    async getUserByEmailIdAndPassword(req:any){
+    async getUserByEmailIdAndPassword(req: any) {
         try {
-            var query = "SELECT * from users where emailid='"+req.body.emailid+"' ALLOW FILTERING;";
-            console.log("query",query);
+            var query = "SELECT * from users where emailid='" + req.body.emailid + "' ALLOW FILTERING;";
+            console.log("query", query);
             var userData = await db.query(query);
-            if(userData.rows.length > 0){
-                let query = "SELECT * from password where password='"+req.body.password+"' AND userid='"+userData.rows[0].id+"' ALLOW FILTERING;";
-                console.log("query",query);
-                var passwordData = await db.query(query); 
-                console.log("passwordData ",passwordData);
-                if(passwordData.rows[0].password != null){
-                    if(req.body.emailid === userData.rows[0].emailid && req.body.password === passwordData.rows[0].password){
-                        let getToken = "SELECT * FROM usertoken where userid='"+userData.rows[0].id+"' AND isactive = true ALLOW FILTERING;";
-                        console.log("query",getToken);
+            if (userData.rows.length > 0) {
+                let query = "SELECT * from password where password='" + req.body.password + "' AND userid='" + userData.rows[0].id + "' ALLOW FILTERING;";
+                console.log("query", query);
+                var passwordData = await db.query(query);
+                console.log("passwordData ", passwordData);
+                if (passwordData.rows[0].password != null) {
+                    if (req.body.emailid === userData.rows[0].emailid && req.body.password === passwordData.rows[0].password) {
+                        let getToken = "SELECT * FROM usertoken where userid='" + userData.rows[0].id + "' AND isactive = true ALLOW FILTERING;";
+                        console.log("query", getToken);
                         var tokenDetails = await db.query(getToken);
                         //console.log("token Data",tokenDetails.rows[0].tokendata);
-                        if(tokenDetails.rows.length > 0 && tokenDetails.rows[0].tokendata !== null && tokenDetails.rows[0].isactive === true){
-                            
-                            let getRoleId = "SELECT role from roleusers where uid="+userData.rows[0].id+" ALLOW FILTERING;";
-                                console.log("query",getRoleId);
-                                var roleData = await db.query(getRoleId);
-                                let userTokenDetails = {
-                                    token:tokenDetails.rows[0].tokendata,
-                                    tokenId:tokenDetails.rows[0].id
-                                }
-                                const iResponse: IResponse = {
-                                    statusCode: "200",
-                                    message: "Login successfully.",
-                                    data: roleData.rows,
-                                    token:userTokenDetails,
-                                }
-                                return iResponse;
+                        if (tokenDetails.rows.length > 0 && tokenDetails.rows[0].tokendata !== null && tokenDetails.rows[0].isactive === true) {
+
+                            let getRoleId = "SELECT role from roleusers where uid=" + userData.rows[0].id + " ALLOW FILTERING;";
+                            console.log("query", getRoleId);
+                            var roleData = await db.query(getRoleId);
+                            let userTokenDetails = {
+                                token: tokenDetails.rows[0].tokendata,
+                                tokenId: tokenDetails.rows[0].id
+                            }
+                            const iResponse: IResponse = {
+                                statusCode: "200",
+                                message: "Login successfully.",
+                                data: roleData.rows,
+                                token: userTokenDetails,
+                            }
+                            return iResponse;
 
                             // let getRoleId = "SELECT roleid from userrole where userid='"+userData.rows[0].id+"' ALLOW FILTERING;";
                             // console.log("query",getRoleId);
@@ -157,29 +157,29 @@ export class UsersRepository {
                             //     }
                             //     return iResponse;
                             // }
-                            
-                        }else{
-                            let token = uuid().toString() +"-"+ uuid().toString() ;
+
+                        } else {
+                            let token = uuid().toString() + "-" + uuid().toString();
                             let userTokenId = uuid();
-                            let query = "INSERT INTO usertoken (id,tokendata,userid,isactive) VALUES("+userTokenId+",'"+token+"','"+userData.rows[0].id+"',true);";
-                            console.log("query",query);
+                            let query = "INSERT INTO usertoken (id,tokendata,userid,isactive) VALUES(" + userTokenId + ",'" + token + "','" + userData.rows[0].id + "',true);";
+                            console.log("query", query);
                             var tokenData = await db.query(query);
-                            if(tokenData){
-                                let getRoleId = "SELECT role from roleusers where userid='"+userData.rows[0].id+"' ALLOW FILTERING;";
-                                console.log("query",getRoleId);
+                            if (tokenData) {
+                                let getRoleId = "SELECT role from roleusers where userid='" + userData.rows[0].id + "' ALLOW FILTERING;";
+                                console.log("query", getRoleId);
                                 var roleData = await db.query(getRoleId);
                                 let userTokenDetails = {
-                                    token:token,
-                                    tokenId:userTokenId
+                                    token: token,
+                                    tokenId: userTokenId
                                 }
                                 const iResponse: IResponse = {
                                     statusCode: "200",
                                     message: "Login successfully.",
                                     data: roleData.rows,
-                                    token:userTokenDetails,
+                                    token: userTokenDetails,
                                 }
                                 return iResponse;
-                                
+
 
 
                                 // if(roleIdData.rows.length > 0){
@@ -205,54 +205,54 @@ export class UsersRepository {
                                 // }
                             }
                         }
-                    }else{
+                    } else {
                         const iResponse: IResponse = {
                             statusCode: "200",
                             message: "Login details not matched",
                         }
                         return iResponse;
                     }
-                }else{
+                } else {
                     const iResponse: IResponse = {
                         statusCode: "200",
                         message: "Password did not match.",
                         data: "",
-                        uuid:"",
+                        uuid: "",
                         error: ""
                     }
-                    return iResponse;  
+                    return iResponse;
                 }
-            }else{
+            } else {
                 const iResponse: IResponse = {
                     statusCode: "200",
                     message: "Email Id not exist",
                     data: "",
-                    uuid:"",
+                    uuid: "",
                     error: ""
                 }
-                return iResponse;  
+                return iResponse;
             }
-           
+
         } catch (error) {
             console.error(error.message);
             const iResponse: IResponse = {
                 statusCode: "500",
                 message: "Something went worng",
                 data: "",
-                uuid:"",
+                uuid: "",
                 error: error.message
             }
             return iResponse;
-        }finally{
-           // db.close();
+        } finally {
+            // db.close();
         }
-       
+
     }
 
-    async userLogout(req:any){
+    async userLogout(req: any) {
         try {
-            var query = "UPDATE usertoken SET isactive = false WHERE id="+req.body.tokenId+";";
-            console.log("query",query);
+            var query = "UPDATE usertoken SET isactive = false WHERE id=" + req.body.tokenId + ";";
+            console.log("query", query);
             var userData = await db.query(query);
             console.log(userData);
             const iResponse: IResponse = {
@@ -260,98 +260,98 @@ export class UsersRepository {
                 message: "Successfully logout user"
             }
             return iResponse;
-           
+
         } catch (error) {
             console.error(error.message);
             const iResponse: IResponse = {
                 statusCode: "500",
                 message: "Something went worng",
                 data: "",
-                uuid:"",
+                uuid: "",
                 error: error.message
             }
             return iResponse;
-        }finally{
-           // db.close();
+        } finally {
+            // db.close();
         }
-    }  
-    async getUserList(req:any){
+    }
+    async getUserList(req: any) {
         try {
             var query = "SELECT * FROM users;";
-            console.log("query",query);
+            console.log("query", query);
             var userData = await db.query(query);
             console.log(userData);
-            if(userData.rows.length > 0){
+            if (userData.rows.length > 0) {
                 const iResponse: IResponse = {
                     statusCode: "200",
                     message: "Successfully fetch user list.",
-                    data:userData.rows
+                    data: userData.rows
                 }
                 return iResponse;
-            }else{
+            } else {
                 const iResponse: IResponse = {
                     statusCode: "200",
                     message: "No data found."
                 }
                 return iResponse;
             }
-           
+
         } catch (error) {
             console.error(error.message);
             const iResponse: IResponse = {
                 statusCode: "500",
                 message: "Something went worng",
                 data: "",
-                uuid:"",
+                uuid: "",
                 error: error.message
             }
             return iResponse;
-        }finally{
-           // db.close();
+        } finally {
+            // db.close();
         }
-    } 
-    async getUserById(req:any){
-        console.log("req",req.params);
+    }
+    async getUserById(req: any) {
+        console.log("req", req.params);
         try {
-            var query = "SELECT * FROM users where id="+req.params.userId+";";
-            console.log("query",query);
+            var query = "SELECT * FROM users where id=" + req.params.userId + ";";
+            console.log("query", query);
             var userData = await db.query(query);
             console.log(userData);
-            if(userData.rows.length > 0){
-                
-                var query = "SELECT role FROM roleusers where uid="+req.params.userId+";";
-                console.log("query",query);
+            if (userData.rows.length > 0) {
+
+                var query = "SELECT role FROM roleusers where uid=" + req.params.userId + ";";
+                console.log("query", query);
                 var roleData = await db.query(query);
                 let userroles = {
-                    user:userData.rows,
-                    role:roleData.rows
+                    user: userData.rows,
+                    role: roleData.rows
                 }
                 const iResponse: IResponse = {
                     statusCode: "200",
                     message: "Successfully fetch user data.",
-                    data:userroles
+                    data: userroles
                 }
                 return iResponse;
-            }else{
+            } else {
                 const iResponse: IResponse = {
                     statusCode: "200",
                     message: "No data found."
                 }
                 return iResponse;
             }
-           
+
         } catch (error) {
             console.error(error.message);
             const iResponse: IResponse = {
                 statusCode: "500",
                 message: "Something went worng",
                 data: "",
-                uuid:"",
+                uuid: "",
                 error: error.message
             }
             return iResponse;
-        }finally{
-           // db.close();
+        } finally {
+            // db.close();
         }
-    } 
+    }
 }

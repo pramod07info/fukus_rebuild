@@ -12,22 +12,45 @@ export class PieceRepository {
 	
 
 	async createPieceAndVideo(req: any) {
-
-		console.log("Request",req.data.title);
-		var query = "INSERT INTO pieces (id,title,userid,status,name,categoryid,nickname) VALUES("+uuid()+",'"+req.data.title+"',"+req.data.user_id+",'"+req.data.status+"','"+req.data.name+"',"+req.data.category_id+",'"+req.data.nickname+"');";
-		console.log("query ",query);
-
-		try {	
-			//var query = 'SELECT * FROM student;';
-        	var data = await db.query(query);
-			const iResponse: IResponse = {
-				statusCode: "200",
-				message: "Data created successfully",
-				data: data,
-				uuid:"",
-				error: ""
+		try {
+			let pieceId = uuid();
+			console.log("Request",req.body);
+			var query = "INSERT INTO pieces (id,title,uid,status,name,categoryid,nickname) VALUES("+pieceId+",'"+req.body.title+"',"+req.body.user_id+",'"+req.body.status+"','"+req.body.name+"',"+req.body.categoryid+",'"+req.body.nickname+"');";
+			console.log("query ",query);
+			var data = await db.query(query);
+			if(data){
+				for(let i=0; i<req.body.video_info.length; i++){
+					let videoId = uuid();
+					var query = "INSERT INTO videoinfo (id,videourl,pieceid,status) VALUES("+videoId+",'"+req.body.video_info[i].video_url+"','"+pieceId+"','"+req.body.video_info[i].status+"');";
+					console.log("query ",query);
+					var videoData = await db.query(query);
+					if(videoData){
+						for(let j = 0 ; j<req.body.video_info[i].sentences.length; j++){
+							let sentencesId = uuid();
+							var query = "INSERT INTO sentences (id,sentences,vid) VALUES("+sentencesId+",'"+req.body.video_info[i].sentences[j].sentence+"',"+videoId+");";
+							console.log("query ",query);
+							var sentencesData = await db.query(query);
+							
+						}	
+					}
+				}
+				for(let i = 0; i < req.body.source_piece.length; i++){
+					let sourceId = uuid();
+					var query = "INSERT INTO sourcepiece (id,name,pieceid,url) VALUES("+sourceId+",'"+req.body.source_piece[i].name+"','"+pieceId+"','"+req.body.source_piece[i].url+"');";
+					var sourceData = await db.query(query);
+					console.log("query ",query);
+				}
+				const iResponse: IResponse = {
+					statusCode: "200",
+					message: "Data created successfully",
+					data: "",
+					uuid:"",
+					error: ""
+				}
+				return iResponse;
+				
 			}
-			return iResponse;
+			
 		} catch (error) {
 			console.error(error.message);
 			const iResponse: IResponse = {
@@ -39,10 +62,116 @@ export class PieceRepository {
 			}
 			return iResponse;
 		} finally {
-			db.close();
+			//db.close();
 		}
 
 	}
+	async updatePiece(req: any) {
+		try {
+			
+			console.log("Request",req.body);
+			var query = "UPDATE pieces SET title='"+req.body.title+"',status='"+req.body.status+"' WHERE id = "+req.body.id+";";
+			console.log("query ",query);
+			var data = await db.query(query);
+			if(data){
+				const iResponse: IResponse = {
+					statusCode: "200",
+					message: "Data updated successfully",
+					data: "",
+					uuid:"",
+					error: ""
+				}
+				return iResponse;
+			}
+			
+		} catch (error) {
+			console.error(error.message);
+			const iResponse: IResponse = {
+				statusCode: "500",
+				message: "Something went worng",
+				data: "",
+				uuid:"",
+				error: error.message
+			}
+			return iResponse;
+		} finally {
+			//db.close();
+		}
+
+	}
+	async getSinglePiece(req: any) {
+		try {
+			console.log("Request",req.body);
+			var query = "SELECT * FROM pieces WHERE id="+req.params.pieceId+" ALLOW FILTERING;";
+			console.log("query ",query);
+			var pieceData = await db.query(query);
+			console.log("Piece data ",pieceData);
+			if(pieceData.rows.length > 0){
+				var query = "SELECT * FROM videoinfo WHERE pieceid='"+req.params.pieceId+"' ALLOW FILTERING;";
+				console.log("query ",query);
+				var videoData = await db.query(query);
+				var videoWithSentences =[];
+				console.log("video: URl",videoData);
+				if(videoData.rows.length > 0){
+					for(let i = 0; i<videoData.rows.length; i++){
+						var query = "SELECT * FROM sentences WHERE vid="+videoData.rows[i].id+" ALLOW FILTERING;";
+						console.log("query ",query);
+						var sentencesData = await db.query(query);
+						let videoSentences ={
+							video_info:videoData.rows[i],
+							sentence:sentencesData.rows
+						}
+						videoWithSentences.push(videoSentences);
+					}
+				}
+
+				var query = "SELECT * FROM sourcepiece WHERE pieceid='"+req.params.pieceId+"' ALLOW FILTERING;";
+				console.log("query ",query);
+				var sentencesData = await db.query(query);
+				var data={
+					piece:pieceData.rows,
+					videoInfo:videoWithSentences,
+					source:sentencesData.rows
+				}
+				const iResponse: IResponse = {
+					statusCode: "200",
+					message: "Data fetched successfully",
+					data:data,
+					uuid:"",
+					error: ""
+				}
+				return iResponse;
+			}else{
+				const iResponse: IResponse = {
+					statusCode: "200",
+					message: "Data not found",
+					data:"",
+					uuid:"",
+					error: ""
+				}
+				return iResponse;
+			}
+			
+		} catch (error) {
+			console.error(error.message);
+			const iResponse: IResponse = {
+				statusCode: "500",
+				message: "Something went worng",
+				data: "",
+				uuid:"",
+				error: error.message
+			}
+			return iResponse;
+		} finally {
+			//db.close();
+		}
+
+	}
+
+
+
+
+
 	// async updatePiece(req: any) {
 	// 	try {
 	// 		const result = await prisma.piece.update({
